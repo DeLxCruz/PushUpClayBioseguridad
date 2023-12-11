@@ -27,6 +27,7 @@ namespace APP.UnitOfWork
         private IContactType _contactTypes;
         private IContract _contracts;
         private IContractType _contractTypes;
+        private IRol _rols;
 
         private readonly BioSecurityContext _context = context;
 
@@ -79,10 +80,7 @@ namespace APP.UnitOfWork
         {
             get
             {
-                if (_personAddresses == null)
-                {
-                    _personAddresses = new PersonAddressRepository(_context);
-                }
+                _personAddresses ??= (IPersonAddress)new PersonAddressRepository(_context);
                 return _personAddresses;
             }
         }
@@ -174,6 +172,15 @@ namespace APP.UnitOfWork
             {
                 _contractTypes ??= new ContractTypeRepository(_context);
                 return _contractTypes;
+            }
+        }
+
+        public IRol Rols
+        {
+            get
+            {
+                _rols ??= new RolRepository(_context);
+                return _rols;
             }
         }
 
