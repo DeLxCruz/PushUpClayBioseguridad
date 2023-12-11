@@ -59,13 +59,13 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.Client", b =>
                 {
-                    b.Property<int>("ClientId")
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<int?>("PersonId")
                         .HasColumnType("int");
 
-                    b.HasKey("ClientId")
+                    b.HasKey("Id")
                         .HasName("PRIMARY");
 
                     b.HasIndex(new[] { "PersonId" }, "PersonId");
@@ -158,13 +158,13 @@ namespace Persistence.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.Employee", b =>
                 {
-                    b.Property<int>("EmployeeId")
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<int?>("PersonId")
                         .HasColumnType("int");
 
-                    b.HasKey("EmployeeId")
+                    b.HasKey("Id")
                         .HasName("PRIMARY");
 
                     b.HasIndex(new[] { "PersonId" }, "PersonId")
@@ -197,8 +197,14 @@ namespace Persistence.Data.Migrations
                     b.Property<DateOnly?>("RegistrationDate")
                         .HasColumnType("date");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id")
                         .HasName("PRIMARY");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.HasIndex(new[] { "CityId" }, "CityId");
 
@@ -291,6 +297,50 @@ namespace Persistence.Data.Migrations
                     b.ToTable("persontype", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("Revoked")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshToken", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Rol", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("RolName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("rol", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
                     b.Property<int>("Id")
@@ -357,6 +407,59 @@ namespace Persistence.Data.Migrations
                     b.HasIndex(new[] { "CountryId" }, "CountryId");
 
                     b.ToTable("state", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar")
+                        .HasColumnName("email");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar")
+                        .HasColumnName("password");
+
+                    b.Property<string>("Username")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar")
+                        .HasColumnName("username");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("user", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserRol", b =>
+                {
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RolId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UsuarioId", "RolId");
+
+                    b.HasIndex("RolId");
+
+                    b.ToTable("userRol", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.City", b =>
@@ -437,11 +540,20 @@ namespace Persistence.Data.Migrations
                         .HasForeignKey("PersonTypeId")
                         .HasConstraintName("person_ibfk_1");
 
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithOne("Person")
+                        .HasForeignKey("Domain.Entities.Person", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("person_user_fk");
+
                     b.Navigation("City");
 
                     b.Navigation("PersonCategory");
 
                     b.Navigation("PersonType");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.Personaddress", b =>
@@ -478,6 +590,17 @@ namespace Persistence.Data.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Schedule", b =>
                 {
                     b.HasOne("Domain.Entities.Contract", "Contract")
@@ -510,6 +633,40 @@ namespace Persistence.Data.Migrations
                         .HasConstraintName("state_ibfk_1");
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.HasOne("Domain.Entities.Client", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId");
+
+                    b.HasOne("Domain.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserRol", b =>
+                {
+                    b.HasOne("Domain.Entities.Rol", "Rol")
+                        .WithMany("UsersRols")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "Usuario")
+                        .WithMany("UsersRols")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rol");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Domain.Entities.Addresstype", b =>
@@ -575,6 +732,11 @@ namespace Persistence.Data.Migrations
                     b.Navigation("People");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Rol", b =>
+                {
+                    b.Navigation("UsersRols");
+                });
+
             modelBuilder.Entity("Domain.Entities.Shift", b =>
                 {
                     b.Navigation("Schedules");
@@ -585,6 +747,15 @@ namespace Persistence.Data.Migrations
                     b.Navigation("Cities");
 
                     b.Navigation("Contracts");
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.Navigation("Person");
+
+                    b.Navigation("RefreshTokens");
+
+                    b.Navigation("UsersRols");
                 });
 #pragma warning restore 612, 618
         }

@@ -19,6 +19,8 @@ public partial class Person : BaseEntity
     public int? CityId { get; set; }
 
     public virtual City City { get; set; }
+    public int UserId { get; set; }
+    public User User { get; set; }
 
     public virtual ICollection<Client> Clients { get; set; } = new List<Client>();
 

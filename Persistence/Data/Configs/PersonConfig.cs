@@ -38,6 +38,10 @@ namespace Persistence.Data.Configs
             builder.HasOne(d => d.PersonType).WithMany(p => p.People)
                 .HasForeignKey(d => d.PersonTypeId)
                 .HasConstraintName("person_ibfk_1");
+
+            builder.HasOne(d => d.User).WithOne(p => p.Person)
+            .HasForeignKey<Person>(d => d.UserId)
+            .HasConstraintName("person_user_fk");
         }
     }
 }

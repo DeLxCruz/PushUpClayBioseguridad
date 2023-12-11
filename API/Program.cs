@@ -1,5 +1,6 @@
 using System.Reflection;
 using API.Extensions;
+using AspNetCoreRateLimit;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 
@@ -33,6 +34,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("CorsPolicy");
+
+app.UseIpRateLimiting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 using (var scope = app.Services.CreateScope())
 {
