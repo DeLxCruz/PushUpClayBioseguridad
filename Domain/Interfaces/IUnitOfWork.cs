@@ -22,6 +22,7 @@ namespace Domain.Interfaces
         IPersonContact PersonContacts { get; }
         IPersonType PersonTypes { get; }
         IRol Rols { get; }
+        IUser Users { get; }
         ISchedule Schedules { get; }
         IShift Shifts { get; }
         IState States { get; }

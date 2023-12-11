@@ -28,6 +28,7 @@ namespace APP.UnitOfWork
         private IContract _contracts;
         private IContractType _contractTypes;
         private IRol _rols;
+        private IUser _users;
 
         private readonly BioSecurityContext _context = context;
 
@@ -181,6 +182,15 @@ namespace APP.UnitOfWork
             {
                 _rols ??= new RolRepository(_context);
                 return _rols;
+            }
+        }
+
+        public IUser Users
+        {
+            get
+            {
+                _users ??= new UserRepository(_context);
+                return _users;
             }
         }
 

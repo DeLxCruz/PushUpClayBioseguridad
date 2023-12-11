@@ -12,13 +12,13 @@ namespace Persistence.Data.Configs
     {
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
-            builder.HasKey(e => e.EmployeeId).HasName("PRIMARY");
+            builder.HasKey(e => e.Id).HasName("PRIMARY");
 
             builder.ToTable("employee");
 
             builder.HasIndex(e => e.PersonId, "PersonId");
 
-            builder.Property(e => e.EmployeeId).ValueGeneratedNever();
+            builder.Property(e => e.Id).ValueGeneratedNever();
 
             builder.HasOne(d => d.Person).WithMany(p => p.Employees)
                 .HasForeignKey(d => d.PersonId)
